@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gotickets/internal/user"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -10,13 +11,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Name  string `json:"name" validate:"required" gorm:"type:varchar(100);not null"`
-	Email string `json:"email" validate:"required,email" gorm:"type:varchar(255); uniqueIndex;not null"`
-	Password string `json:"password" validate:"required,min=6" gorm:"type:varchar(100);not null"`
-}
 
 type CustomValidator struct {
 	validator *validator.Validate
@@ -42,7 +36,7 @@ func main() {
 		fmt.Println("Database Connected Successfully!")
 	}
 
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&user.User{})
 
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
@@ -50,28 +44,14 @@ func main() {
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.Recover())
 
+	userRepo := user.NewRepository(db)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+
 	e.GET("/", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Hello, World!"})
 	})
-
-	e.POST("/users", func(c *echo.Context) error {
-		newUser := new(User)
-
-		if err := c.Bind(&newUser); err != nil {
-			return c.String(http.StatusBadRequest, "bad request")
-		}
-
-		if err := c.Validate(newUser); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]any{"error": err.Error()})
-		}
-
-		result := db.Create(newUser)
-		if result.Error != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]any{"error": result.Error.Error()})
-		}
-		// executeSomeBusinessLogic(newUser)
-		return c.JSON(http.StatusCreated, newUser)
-	})
+	e.POST("/users", userHandler.CreateUser)
 
 	if err := e.Start(":8080"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
