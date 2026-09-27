@@ -1,2 +1,3 @@
 1. go mod init module_name
-2. 
+2. https://echo.labstack.com/guide/quickstart/ ---> echo setup
+3. 
