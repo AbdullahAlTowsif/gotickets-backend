@@ -30,7 +30,7 @@ func (h *handler) CreateUser(c *echo.Context) error {
 	if err := c.Validate(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, httpResponse.Error{
 			Code:    http.StatusBadRequest,
-			Message: "Invalid request payload",
+			Message: "Validation Failed!",
 			Details: err.Error(),
 		})
 	}
@@ -52,4 +52,41 @@ func (h *handler) CreateUser(c *echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusCreated, res)
+}
+
+func (h *handler) LoginUser(c *echo.Context) error {
+	var req dto.LoginUserRequestDto
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, httpResponse.Error{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid request payload",
+			Details: err.Error(),
+		})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, httpResponse.Error{
+			Code:    http.StatusBadRequest,
+			Message: "Validation Failed!",
+			Details: err.Error(),
+		})
+	}
+
+	response, err := h.service.LoginUser(req)
+	if err != nil  {
+		if errors.Is(err, ErrorInvalidCredentials) {
+			return c.JSON(http.StatusUnauthorized, httpResponse.Error {
+				Code: http.StatusUnauthorized,
+				Message: "Invalid email or password",
+				Details: err.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusInternalServerError, httpResponse.Error{
+			Code: http.StatusInternalServerError,
+			Message: "Failed to login user",
+			Details: err.Error(),
+		})
+	}
+	return c.JSON(http.StatusOK, response)
 }
