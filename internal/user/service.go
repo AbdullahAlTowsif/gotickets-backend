@@ -14,10 +14,14 @@ func (s *service) CreateUser(req dto.CreateUserRequestDto) (*dto.UserResponseDto
 	user := User{
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: req.Password,
+		// Password: req.Password,
+	}
+	err := user.hashPassword(req.Password)
+	if err != nil {
+		return nil, err
 	}
 
-	err := s.repo.CreateUser(&user)
+	err = s.repo.CreateUser(&user)
 	if err != nil {
 		return nil, err
 	}
