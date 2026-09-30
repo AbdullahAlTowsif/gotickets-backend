@@ -90,3 +90,24 @@ func (h *handler) LoginUser(c *echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response)
 }
+
+
+func (h *handler) GetMe(c *echo.Context) error {
+	userID, ok := c.Get("user_id").(uint)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, httpResponse.Error{
+			Code: http.StatusUnauthorized,
+			Message: "Cannot get user information",
+			Details: "Missing user_id in context",
+		})
+	}
+
+	email, _ := c.Get("user_email").(string)
+	name, _ := c.Get("user_name").(string)
+
+	return c.JSON(http.StatusOK, dto.UserResponseDto{
+		ID: userID,
+		Name: name,
+		Email: email,
+	})
+}
