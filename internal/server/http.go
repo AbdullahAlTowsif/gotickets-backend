@@ -40,7 +40,7 @@ func StartServer(db *gorm.DB, cfg *config.Config) {
 	})
 
 	// Register Routes
-	user.RegisterUserRoutes(e, db)
+	user.RegisterUserRoutes(e, db, cfg)
 	event.RegisterRoutes(e, db)
 	booking.RegisterRoutes(e, db, cfg)
 
