@@ -2,8 +2,8 @@ package user
 
 import (
 	"errors"
+	"gotickets/internal/domain/user/dto"
 	"gotickets/internal/httpResponse"
-	"gotickets/internal/user/dto"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
