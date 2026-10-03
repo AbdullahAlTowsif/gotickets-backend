@@ -1,3 +1,6 @@
 1. go mod init module_name
 2. https://echo.labstack.com/guide/quickstart/ ---> echo setup
 3. https://gorm.io/index.html ---> GORM setup
+4. To build the go application ---> go build -o bin/gotickets ./cmd
+here, go build -o <the_output_file> <my_main.go_location>
+5. air ---> to run automatically

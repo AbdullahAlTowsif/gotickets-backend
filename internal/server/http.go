@@ -36,7 +36,7 @@ func StartServer(db *gorm.DB, cfg *config.Config) {
 	e.Use(middleware.Recover())
 
 	e.GET("/", func(c *echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"message": "Hello, World!"})
+		return c.JSON(http.StatusOK, map[string]string{"message": "Hello, World! GoTickets API is running."})
 	})
 
 	// Register Routes
